@@ -10,24 +10,24 @@ token: Final [str] = open("bot_token.txt").read()
 
 try:
     bot = telebot.TeleBot(token)
-    msg_ids = []
+    msg_ids = [] # list to remember each sended message by bot (for /clear comma)
 
-    def buttons(menu_id: str = ''):
+    def buttons(menu_id: str = ''): # to generate Keyboard
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         match menu_id:
-            case 'dice': #dice throwing
+            case 'dice': # dice throwing
                 dice_list = ['/Throw_dice_1_times', '/Throw_dice_2_times', '/Throw_dice_20', '/back']
                 markup.add(*[types.KeyboardButton(i) for i in dice_list])
 
                 return markup
 
-            case 'timer': #timer
+            case 'timer': # timer
                 timer_list = ['/30_secs', '/1_min', '/5_mins', '/back']
                 markup.add(*[types.KeyboardButton(i) for i in timer_list])
 
                 return markup
 
-            case _:
+            case _: # main menu
                 main_menu_list = ['/time', "/clear", "/date", "/dice", "/timer"]
                 markup.add(*[types.KeyboardButton(i) for i in main_menu_list])
 
@@ -67,8 +67,9 @@ try:
 
     @bot.message_handler(commands=['clear'])
     def clear(message):
-        bot.delete_messages(message.chat.id, msg_ids)
-        msg_ids.clear()
+        if msg_ids:
+            bot.delete_messages(message.chat.id, msg_ids)
+            msg_ids.clear()
 
 
     @bot.message_handler(commands=['dice'])
